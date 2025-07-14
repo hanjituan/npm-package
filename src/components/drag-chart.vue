@@ -78,9 +78,7 @@ const handlerResize = () => {
 };
 useResizeObserver(chartRef, handlerResize);
 
-const MaxTick = computed(() => {
-  return 24 * props.timeRange.length - 1;
-});
+const MaxTick = computed(() => 24 * props.timeRange.length - 1);
 // 图表初始化Axis data
 const xAxisData = computed(() => {
   const result = [];

@@ -1,15 +1,15 @@
 ### Drag Chart 组件 参数说明
 
-| 参数       | 说明                                  | 类型                          | 默认值                                                                      |
-| ---------- | ------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
-| timeRange  | x 轴的开始和结束时间                  | _string_ _Date_ _dayjs.Dayjs_ | \*\*                                                                        |
-| startIcon  | 拖拽开始的 icon                       | string                        | [icon-left](https://img.icons8.com/material-outlined/24/000000/left2.png)   |
-| endIcon    | 拖拽结束的 icon                       | string                        | [icon-right](https://img.icons8.com/material-outlined/24/000000/right2.png) |
-| symbolSize | 拖拽点的大小                          | _Number_                      | 20                                                                          |
-| valueData  | 有数据的内容部分                      | _Array_                       | []                                                                          |
-| activeTime | 当前时间范围, v-model:activeTime 的值 | _Array_                       | [1,12]                                                                      |
-| interval   | X 轴的间隔                            | Number                        | 4                                                                           |
-|            |                                       |                               |                                                                             |
+| 参数         | 说明                                  | 类型                          | 默认值                                                                      |
+| ------------ | ------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| timeRange    | x 轴的开始和结束时间                  | _string_ _Date_ _dayjs.Dayjs_ | \*\*                                                                        |
+| startIcon    | 拖拽开始的 icon                       | string                        | [icon-left](https://img.icons8.com/material-outlined/24/000000/left2.png)   |
+| endIcon      | 拖拽结束的 icon                       | string                        | [icon-right](https://img.icons8.com/material-outlined/24/000000/right2.png) |
+| symbolSize   | 拖拽点的大小                          | _Number_                      | 20                                                                          |
+| valueData    | 有数据的内容部分                      | _Array_                       | []                                                                          |
+| activeTime   | 当前时间范围, v-model:activeTime 的值 | _Array_                       | [1,12]                                                                      |
+| interval     | X 轴的间隔                            | Number                        | 4                                                                           |
+| autoInterval | 是否开自动间隔                        | Boolean                       | true                                                                        |
 
 ### 后续 组件迭代支持
 
