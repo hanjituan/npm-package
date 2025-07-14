@@ -1,0 +1,46 @@
+| 参数       | 说明                                  | 类型                          | 默认值                                                                      |
+| ---------- | ------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| timeRange  | x 轴的开始和结束时间                  | _string_ _Date_ _dayjs.Dayjs_ | \*\*                                                                        |
+| startIcon  | 拖拽开始的 icon                       | string                        | [icon-left](https://img.icons8.com/material-outlined/24/000000/left2.png)   |
+| endIcon    | 拖拽结束的 icon                       | string                        | [icon-right](https://img.icons8.com/material-outlined/24/000000/right2.png) |
+| symbolSize | 拖拽点的大小                          | _Number_                      | 20                                                                          |
+| valueData  | 有数据的内容部分                      | _Array_                       | []                                                                          |
+| activeTime | 当前时间范围, v-model:activeTime 的值 | _Array_                       | [1,12]                                                                      |
+| interval   | X 轴的间隔                            | Number                        | 4                                                                           |
+|            |                                       |                               |                                                                             |
+
+### 组件需求
+
+- [ ] 支持拖拽左右移动
+- [ ] 改变时间之后, 判断之前 activeTIme 是否在 改变的时间范围内,
+  - 在范围内 => 不变
+  - activeTime[0]小于 rangeTime[0] => 则 activeTime 开始时间为 rangeTime 的开始
+  - activeTime[0]大于 rangeTime[1] => activeTime = rangeTime
+- [ ] 支持自定义颜色(覆盖颜色, 边框颜色, 有数据的弧度)
+- [ ] 支持部分配置自定义
+- [ ] x 轴的日期最好都显示出来
+- [ ] 支持最大/最小选择范围(多少 h)
+- [ ] 按需引入, 优化打包体积
+- [ ] 支持点击改变位置, 做成可配,默认开启
+- [ ] 限制日期,目前为 7 天
+
+### BUG
+
+- [ ] 缩小到最小之后, 再次放大/缩小失效
+
+例子:
+![Example](https://i.imgur.com/YOUR_IMAGE_ID.png)
+
+<!--
+备选方案：
+- GitHub: https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO_NAME/main/image.png
+- jsDelivr: https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO_NAME/image.png
+-->
+
+<!--
+
+npm run build
+npm publish
+每次发布修改 package.json 的 version 字段
+
+ -->
