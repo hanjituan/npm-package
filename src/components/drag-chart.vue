@@ -14,9 +14,10 @@ import {
   PropType,
   ref,
   watch,
-  onBeforeMount,
 } from "vue";
 import { useResizeObserver } from "@vueuse/core";
+import LeftImg from "@/assets/imgs/arrow-circle-left.png";
+import RightImg from "@/assets/imgs/arrow-circle-right.png";
 
 const props = defineProps({
   // x轴的开始和结束时间
@@ -27,12 +28,12 @@ const props = defineProps({
   // 开始图标
   startIcon: {
     type: String,
-    default: "https://img.icons8.com/material-outlined/24/000000/left2.png",
+    default: LeftImg,
   },
   // 结束图标
   endIcon: {
     type: String,
-    default: "https://img.icons8.com/material-outlined/24/000000/right2.png",
+    default: RightImg,
   },
   // 拖拽点的大小
   symbolSize: {
@@ -54,7 +55,13 @@ const props = defineProps({
     type: Number,
     default: 4,
   },
+  // 是否自动计算间隔, 如果为true，则interval会被忽略
   autoInterval: {
+    type: Boolean,
+    default: true,
+  },
+  // 是否支持点击修改位置
+  needClick: {
     type: Boolean,
     default: true,
   },
@@ -195,7 +202,7 @@ const updateChartData = () => {
         z: 80,
         silent: true,
         animation: false,
-        symbolSize: 20, // TODO: 待确认
+        symbolSize: 0,
       },
       {
         id: "b",
@@ -433,7 +440,7 @@ const getChartOption = (): echarts.EChartsOption => {
         smooth: true,
         data: data.value,
         areaStyle: {},
-        symbolSize: 20, // TODO: 待确认 // props.symbolSize,
+        symbolSize: 0,
       },
       ...seriesData,
     ],
@@ -476,7 +483,6 @@ const getBorderStyle = (initialPoints: string | any[]): any => {
 };
 
 const onChartClick = (params: any) => {
-  // console.log('Chart clicked:', params)
   // 获取点击的坐标
   const pointInPixel = [params.offsetX, params.offsetY];
   // 将像素坐标转换为数据坐标
@@ -484,9 +490,44 @@ const onChartClick = (params: any) => {
     { seriesIndex: 0 },
     pointInPixel
   );
-  // console.log('Clicked position in data:', pointInData)
-  // 这里可以添加你的业务逻辑
-  // 例如：添加新的数据点
+
+  if (!pointInData || pointInData.length < 2) return;
+
+  // 确保点击的 x 坐标在有效范围内
+  const clickX = Math.round(
+    Math.min(Math.max(pointInData[0], 0), MaxTick.value)
+  );
+
+  // 获取当前左右两个点的 x 坐标
+  const leftPointX = Math.min(data.value[0][0], data.value[1][0]);
+  const rightPointX = Math.max(data.value[0][0], data.value[1][0]);
+
+  // 计算点击位置到左右两个点的距离
+  const distanceToLeft = Math.abs(clickX - leftPointX);
+  const distanceToRight = Math.abs(clickX - rightPointX);
+
+  // 判断点击位置更靠近哪个点
+  const isCloserToLeft = distanceToLeft <= distanceToRight;
+
+  // 找出哪个是左边的点，哪个是右边的点
+  const leftPointIndex = data.value[0][0] <= data.value[1][0] ? 0 : 1;
+  const rightPointIndex = leftPointIndex === 0 ? 1 : 0;
+
+  if (isCloserToLeft) {
+    // 更新左边的点，但不能超过右边的点
+    const maxLeftX = rightPointX - 1; // 至少保持1个单位的距离
+    const newLeftX = Math.min(clickX, maxLeftX);
+    data.value[leftPointIndex] = [newLeftX, 0];
+  } else {
+    // 更新右边的点，但不能小于左边的点
+    const minRightX = leftPointX + 1; // 至少保持1个单位的距离
+    const newRightX = Math.max(clickX, minRightX);
+    data.value[rightPointIndex] = [newRightX, 0];
+  }
+
+  // 更新图表和激活时间
+  updateChartData();
+  updateActiveTime();
 };
 
 // onBeforeMount(() => {
@@ -546,8 +587,10 @@ onMounted(() => {
   // 添加事件监听
   window.addEventListener("resize", updatePosition);
   myChart.on("dataZoom", updatePosition);
-  // 添加点击事件监听
-  myChart.getZr().on("click", onChartClick);
+  if (props.needClick) {
+    // 添加点击事件监听
+    myChart.getZr().on("click", onChartClick);
+  }
 
   // 添加滚轮事件监听
   chartRef.value.addEventListener("wheel", handleWheel, { passive: false });

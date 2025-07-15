@@ -9,6 +9,11 @@ export default defineConfig({
 		vue(),
 		VueSetupExtend()
 	],
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, 'src')
+		}
+	},
 	build: {
 		outDir: 'drah-chart',
 		lib: {
