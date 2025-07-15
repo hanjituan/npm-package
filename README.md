@@ -10,6 +10,9 @@
 | activeTime   | 当前时间范围, v-model:activeTime 的值 | _Array_                       | [1,12]                                                                      |
 | interval     | X 轴的间隔                            | Number                        | 4                                                                           |
 | autoInterval | 是否开自动间隔                        | Boolean                       | true                                                                        |
+| needClick    | 是否支持点击修改位置                  | Boolean                       | true                                                                        |
+| maxRange     | 最大选择范围（小时）                  | Number                        | 72 (3 天)                                                                   |
+| minRange     | 最小选择范围（小时）                  | Number                        | 3                                                                           |
 
 ### 后续 组件迭代支持
 
@@ -21,17 +24,17 @@
 - [ ] 支持自定义颜色(覆盖颜色, 边框颜色, 有数据的弧度)
 - [ ] 支持部分配置自定义
 - [ ] x 轴的日期最好都显示出来
-- [ ] 支持最大/最小选择范围(多少 h)
+- [x] 支持最大/最小选择范围(多少 h) - 已完成，默认最大 72h，最小 3h
 - [ ] 按需引入, 优化打包体积
-- [ ] 支持点击改变位置, 做成可配,默认开启
+- [x] 支持点击改变位置, 做成可配,默认开启 - 已完成，通过 needClick 控制
 - [ ] 限制日期,目前为 7 天
 
 ### 目前已知 BUG
 
-- [ ] 缩小到最小之后, 再次放大/缩小失效
+- [ ] 缩小到最小之后, 再次放大/缩小失效 - 已修复，现在支持配置最大最小范围
 
 例子:
-![Example](./image.png)
+![Example](https://raw.githubusercontent.com/hanjituan/npm-package/main/image.png)
 
 <!--
 

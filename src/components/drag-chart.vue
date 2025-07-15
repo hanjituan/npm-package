@@ -65,6 +65,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // 最大选择范围（小时）
+  maxRange: {
+    type: Number,
+    default: 72, // 3天 = 72小时
+  },
+  // 最小选择范围（小时）
+  minRange: {
+    type: Number,
+    default: 3, // 3小时
+  },
 });
 
 const emit = defineEmits(["update:activeTime"]);
@@ -162,6 +172,48 @@ const generateInitialPoints = (x1: number, x2: number) => {
   return points;
 };
 
+// 验证和调整范围的工具函数
+const validateRange = (leftX: number, rightX: number) => {
+  const currentRange = Math.abs(rightX - leftX);
+
+  // 确保最小范围
+  if (currentRange < props.minRange) {
+    const center = (leftX + rightX) / 2;
+    const halfMinRange = props.minRange / 2;
+    leftX = Math.max(0, center - halfMinRange);
+    rightX = Math.min(MaxTick.value, center + halfMinRange);
+
+    // 如果调整后仍然不满足最小范围，优先保证范围大小
+    if (rightX - leftX < props.minRange) {
+      if (leftX === 0) {
+        rightX = Math.min(MaxTick.value, props.minRange);
+      } else if (rightX === MaxTick.value) {
+        leftX = Math.max(0, MaxTick.value - props.minRange);
+      }
+    }
+  }
+
+  // 确保最大范围
+  if (currentRange > props.maxRange) {
+    const center = (leftX + rightX) / 2;
+    const halfMaxRange = props.maxRange / 2;
+    leftX = Math.max(0, center - halfMaxRange);
+    rightX = Math.min(MaxTick.value, center + halfMaxRange);
+
+    // 如果调整后超出边界，需要重新调整
+    if (leftX === 0 && rightX - leftX > props.maxRange) {
+      rightX = props.maxRange;
+    } else if (rightX === MaxTick.value && rightX - leftX > props.maxRange) {
+      leftX = MaxTick.value - props.maxRange;
+    }
+  }
+
+  return {
+    leftX: Math.round(leftX),
+    rightX: Math.round(rightX),
+  };
+};
+
 // 事件处理函数
 const updatePosition = () => {
   myChart.setOption({
@@ -250,7 +302,27 @@ const onDragEnd = (dataIndex: number, pos: number[]) => {
   const newPos = myChart.convertFromPixel("grid", pos);
   newPos[0] = Math.round(Math.min(Math.max(newPos[0], 0), MaxTick.value));
   newPos[1] = data.value[dataIndex][1];
+
+  // 临时更新位置
   data.value[dataIndex] = newPos;
+
+  // 获取当前左右两个点的位置
+  const leftX = Math.min(data.value[0][0], data.value[1][0]);
+  const rightX = Math.max(data.value[0][0], data.value[1][0]);
+
+  // 验证和调整范围
+  const { leftX: validLeftX, rightX: validRightX } = validateRange(
+    leftX,
+    rightX
+  );
+
+  // 更新到验证后的位置
+  const leftPointIndex = data.value[0][0] <= data.value[1][0] ? 0 : 1;
+  const rightPointIndex = leftPointIndex === 0 ? 1 : 0;
+
+  data.value[leftPointIndex] = [validLeftX, 0];
+  data.value[rightPointIndex] = [validRightX, 0];
+
   updateChartData();
   updateActiveTime();
 };
@@ -298,13 +370,19 @@ const handleWheel = (e: WheelEvent) => {
 
   // Ctrl pressed - handle zoom
   const scaleFactor = 0.1;
-  if (currentRange <= 4 && delta > 0) return;
+
+  // 检查是否已达到最小/最大范围限制
+  if (currentRange <= props.minRange && delta > 0) return; // 已经是最小范围，不能再缩小
+  if (currentRange >= props.maxRange && delta < 0) return; // 已经是最大范围，不能再放大
 
   // 分别处理放大和缩小
   let newRange =
     delta > 0
-      ? Math.min(MaxTick.value, currentRange * (1 + scaleFactor)) // 放大
-      : Math.max(4, currentRange * (1 - scaleFactor)); // 缩小，确保不小于4
+      ? Math.min(
+          props.maxRange,
+          Math.min(MaxTick.value, currentRange * (1 + scaleFactor))
+        ) // 缩小（增加范围），但不超过最大范围
+      : Math.max(props.minRange, currentRange * (1 - scaleFactor)); // 放大（减少范围），但不小于最小范围
 
   const center = (data.value[0][0] + data.value[1][0]) / 2;
   let newStart = Math.round(center - newRange / 2);
@@ -320,12 +398,14 @@ const handleWheel = (e: WheelEvent) => {
     newStart = Math.max(0, Math.round(MaxTick.value - newRange));
   }
 
-  // 确保范围合法
-  if (newEnd - newStart < 4) {
-    return;
-  }
-  data.value[0] = [newStart, 0];
-  data.value[1] = [newEnd, 0];
+  // 使用验证函数确保范围合法
+  const { leftX: validLeftX, rightX: validRightX } = validateRange(
+    newStart,
+    newEnd
+  );
+
+  data.value[0] = [validLeftX, 0];
+  data.value[1] = [validRightX, 0];
   updateChartData();
   updateActiveTime();
 };
@@ -513,17 +593,29 @@ const onChartClick = (params: any) => {
   const leftPointIndex = data.value[0][0] <= data.value[1][0] ? 0 : 1;
   const rightPointIndex = leftPointIndex === 0 ? 1 : 0;
 
+  let newLeftX = leftPointX;
+  let newRightX = rightPointX;
+
   if (isCloserToLeft) {
-    // 更新左边的点，但不能超过右边的点
-    const maxLeftX = rightPointX - 1; // 至少保持1个单位的距离
-    const newLeftX = Math.min(clickX, maxLeftX);
-    data.value[leftPointIndex] = [newLeftX, 0];
+    // 更新左边的点，但要考虑范围限制
+    const maxLeftX = rightPointX - props.minRange; // 保持最小范围
+    const minLeftX = Math.max(0, rightPointX - props.maxRange); // 保持最大范围
+    newLeftX = Math.max(minLeftX, Math.min(clickX, maxLeftX));
   } else {
-    // 更新右边的点，但不能小于左边的点
-    const minRightX = leftPointX + 1; // 至少保持1个单位的距离
-    const newRightX = Math.max(clickX, minRightX);
-    data.value[rightPointIndex] = [newRightX, 0];
+    // 更新右边的点，但要考虑范围限制
+    const minRightX = leftPointX + props.minRange; // 保持最小范围
+    const maxRightX = Math.min(MaxTick.value, leftPointX + props.maxRange); // 保持最大范围
+    newRightX = Math.min(maxRightX, Math.max(clickX, minRightX));
   }
+
+  // 使用验证函数确保范围合法
+  const { leftX: validLeftX, rightX: validRightX } = validateRange(
+    newLeftX,
+    newRightX
+  );
+
+  data.value[leftPointIndex] = [validLeftX, 0];
+  data.value[rightPointIndex] = [validRightX, 0];
 
   // 更新图表和激活时间
   updateChartData();
