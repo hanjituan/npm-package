@@ -31,13 +31,7 @@
 - [ ] 缩小到最小之后, 再次放大/缩小失效
 
 例子:
-![Example](https://i.imgur.com/YOUR_IMAGE_ID.png)
-
-<!--
-备选方案：
-- GitHub: https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO_NAME/main/image.png
-- jsDelivr: https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO_NAME/image.png
--->
+![Example](./image.png)
 
 <!--
 

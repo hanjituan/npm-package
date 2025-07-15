@@ -14,6 +14,7 @@ import {
   PropType,
   ref,
   watch,
+  onBeforeMount,
 } from "vue";
 import { useResizeObserver } from "@vueuse/core";
 
@@ -21,7 +22,7 @@ const props = defineProps({
   // x轴的开始和结束时间
   timeRange: {
     type: Array as PropType<(string | Date | dayjs.Dayjs)[]>,
-    default: () => [dayjs(), dayjs()],
+    default: () => [dayjs().subtract(1, "day"), dayjs()],
   },
   // 开始图标
   startIcon: {
@@ -64,20 +65,6 @@ const emit = defineEmits(["update:activeTime"]);
 const chartRef = ref();
 let myChart: echarts.EChartsType;
 
-const data = ref([
-  [10, 0],
-  [20, 0],
-]);
-const handlerResize = () => {
-  if (myChart) {
-    myChart.resize({
-      width: "auto",
-      height: "auto",
-    });
-  }
-};
-useResizeObserver(chartRef, handlerResize);
-
 const MaxTick = computed(() => 24 * props.timeRange.length - 1);
 // 图表初始化Axis data
 const xAxisData = computed(() => {
@@ -88,11 +75,49 @@ const xAxisData = computed(() => {
   for (let i = 0; i <= diffDays; i++) {
     const currentDate = startDate.add(i, "day");
     for (let j = 0; j < 24; j++) {
-      result.push(currentDate.hour(j).format("YYYY-MM-DD HH:mm:ss"));
+      result.push(currentDate.hour(j).format("YYYY-MM-DD HH:00:00"));
     }
   }
   return result;
 });
+
+const data = computed({
+  get() {
+    return getInitialData();
+  },
+  set(val) {
+    emit("update:activeTime", val);
+  },
+});
+
+const getInitialData = () => {
+  if (!props.activeTime || props.activeTime.length !== 2) {
+    return [
+      [0, 0],
+      [xAxisData.value.length - 1, 0],
+    ];
+  }
+  const x1 = xAxisData.value.findIndex((x) =>
+    dayjs(x).isSame(dayjs(props.activeTime[0]), "hour")
+  );
+  const x2 = xAxisData.value.findIndex((x) =>
+    dayjs(x).isSame(dayjs(props.activeTime[1]), "hour")
+  );
+  return [
+    [x1, 0],
+    [x2, 0],
+  ];
+};
+
+const handlerResize = () => {
+  if (myChart) {
+    myChart.resize({
+      width: "auto",
+      height: "auto",
+    });
+  }
+};
+useResizeObserver(chartRef, handlerResize);
 
 // 实际展示的节点个数
 const intervalReal = computed(() => {
@@ -208,7 +233,6 @@ const updateChartData = () => {
 };
 
 const updateActiveTime = () => {
-  // console.log('updateActiveTime', xAxisData.value, data.value)
   emit(
     "update:activeTime",
     data.value.map((item) => xAxisData.value[item[0]])
@@ -258,10 +282,8 @@ const handleWheel = (e: WheelEvent) => {
       newStart = MaxTick.value - currentRange;
     }
 
-    data.value = [
-      [newStart, 0],
-      [newEnd, 0],
-    ];
+    data.value[0] = [newStart, 0];
+    data.value[1] = [newEnd, 0];
     updateChartData();
     updateActiveTime();
     return;
@@ -295,11 +317,8 @@ const handleWheel = (e: WheelEvent) => {
   if (newEnd - newStart < 4) {
     return;
   }
-
-  data.value = [
-    [newStart, 0],
-    [newEnd, 0],
-  ];
+  data.value[0] = [newStart, 0];
+  data.value[1] = [newEnd, 0];
   updateChartData();
   updateActiveTime();
 };
@@ -361,14 +380,16 @@ const getChartOption = (): echarts.EChartsOption => {
     },
     grid: {
       top: "50%",
-      left: "17",
-      right: "20",
+      left: "50",
+      right: "50",
     },
     xAxis: {
       min: 0,
       max: MaxTick.value,
       interval: props.autoInterval ? intervalReal.value : props.interval,
       type: "value",
+      // boundaryGap: "0%",
+      boundaryGap: ["0%", "100%"],
       axisLine: { onZero: false },
       axisTick: { inside: true },
       splitLine: { show: false },
@@ -467,6 +488,21 @@ const onChartClick = (params: any) => {
   // 这里可以添加你的业务逻辑
   // 例如：添加新的数据点
 };
+
+// onBeforeMount(() => {
+//   if (props.activeTime) {
+//     const x1 = xAxisData.value.findIndex((x) =>
+//       dayjs(x).isSame(dayjs(props.activeTime[0]), "hour")
+//     );
+//     const x2 = xAxisData.value.findIndex((x) =>
+//       dayjs(x).isSame(dayjs(props.activeTime[1]), "hour")
+//     );
+//     data.value = [
+//       [x1, 0],
+//       [x2, 0],
+//     ];
+//   }
+// });
 
 // 初始化图表
 onMounted(() => {

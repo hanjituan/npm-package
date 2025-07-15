@@ -1,62 +1,62 @@
-import { getCurrentScope as K, onScopeDispose as N, computed as x, toValue as I, watch as Y, shallowRef as V, getCurrentInstance as X, onMounted as F, defineComponent as B, ref as A, onBeforeUnmount as $, createElementBlock as j, openBlock as G, createElementVNode as U } from "vue";
-import p from "dayjs";
-import * as q from "echarts";
-function J(i) {
-  return K() ? (N(i), !0) : !1;
+import { getCurrentScope as G, onScopeDispose as K, computed as b, toValue as L, watch as Y, shallowRef as N, getCurrentInstance as V, onMounted as F, defineComponent as B, ref as X, onBeforeUnmount as $, createElementBlock as j, openBlock as U, createElementVNode as q } from "vue";
+import c from "dayjs";
+import * as J from "echarts";
+function Q(i) {
+  return G() ? (K(i), !0) : !1;
 }
-const Q = typeof window < "u" && typeof document < "u";
+const ee = typeof window < "u" && typeof document < "u";
 typeof WorkerGlobalScope < "u" && globalThis instanceof WorkerGlobalScope;
-const ee = Q ? window : void 0;
-function L(i) {
+const te = ee ? window : void 0;
+function A(i) {
   var l;
-  const t = I(i);
+  const t = L(i);
   return (l = t?.$el) != null ? l : t;
 }
-function te() {
-  const i = V(!1), l = X();
+function ne() {
+  const i = N(!1), l = V();
   return l && F(() => {
     i.value = !0;
   }, l), i;
 }
-function ne(i) {
-  const l = te();
-  return x(() => (l.value, !!i()));
+function oe(i) {
+  const l = ne();
+  return b(() => (l.value, !!i()));
 }
-function oe(i, l, t = {}) {
-  const { window: h = ee, ...v } = t;
+function ae(i, l, t = {}) {
+  const { window: g = te, ...h } = t;
   let r;
-  const n = ne(() => h && "ResizeObserver" in h), _ = () => {
+  const d = oe(() => g && "ResizeObserver" in g), p = () => {
     r && (r.disconnect(), r = void 0);
-  }, c = x(() => {
-    const g = I(i);
-    return Array.isArray(g) ? g.map((y) => L(y)) : [L(g)];
-  }), b = Y(
-    c,
-    (g) => {
-      if (_(), n.value && h) {
+  }, o = b(() => {
+    const y = L(i);
+    return Array.isArray(y) ? y.map((x) => A(x)) : [A(y)];
+  }), z = Y(
+    o,
+    (y) => {
+      if (p(), d.value && g) {
         r = new ResizeObserver(l);
-        for (const y of g)
-          y && r.observe(y, v);
+        for (const x of y)
+          x && r.observe(x, h);
       }
     },
     { immediate: !0, flush: "post" }
-  ), S = () => {
-    _(), b();
+  ), T = () => {
+    p(), z();
   };
-  return J(S), {
-    isSupported: n,
-    stop: S
+  return Q(T), {
+    isSupported: d,
+    stop: T
   };
 }
-const ae = { class: "chart-container" }, re = B({
+const re = { class: "chart-container" }, ie = B({
   name: "DragChart"
-}), ie = /* @__PURE__ */ B({
-  ...re,
+}), se = /* @__PURE__ */ B({
+  ...ie,
   props: {
     // x轴的开始和结束时间
     timeRange: {
       type: Array,
-      default: () => [p(), p()]
+      default: () => [c().subtract(1, "day"), c()]
     },
     // 开始图标
     startIcon: {
@@ -95,40 +95,59 @@ const ae = { class: "chart-container" }, re = B({
   },
   emits: ["update:activeTime"],
   setup(i, { emit: l }) {
-    const t = i, h = l, v = A();
+    const t = i, g = l, h = X();
     let r;
-    const n = A([
-      [10, 0],
-      [20, 0]
-    ]);
-    oe(v, () => {
+    const d = b(() => 24 * t.timeRange.length - 1), p = b(() => {
+      const e = [], a = c(t.timeRange[0]), u = c(t.timeRange[t.timeRange.length - 1]).diff(a, "day");
+      for (let f = 0; f <= u; f++) {
+        const v = a.add(f, "day");
+        for (let s = 0; s < 24; s++)
+          e.push(v.hour(s).format("YYYY-MM-DD HH:00:00"));
+      }
+      return e;
+    }), o = b({
+      get() {
+        return z();
+      },
+      set(e) {
+        g("update:activeTime", e);
+      }
+    }), z = () => {
+      if (!t.activeTime || t.activeTime.length !== 2)
+        return [
+          [0, 0],
+          [p.value.length - 1, 0]
+        ];
+      const e = p.value.findIndex(
+        (n) => c(n).isSame(c(t.activeTime[0]), "hour")
+      ), a = p.value.findIndex(
+        (n) => c(n).isSame(c(t.activeTime[1]), "hour")
+      );
+      return [
+        [e, 0],
+        [a, 0]
+      ];
+    };
+    ae(h, () => {
       r && r.resize({
         width: "auto",
         height: "auto"
       });
     });
-    const c = x(() => 24 * t.timeRange.length - 1), b = x(() => {
-      const e = [], o = p(t.timeRange[0]), u = p(t.timeRange[t.timeRange.length - 1]).diff(o, "day");
-      for (let m = 0; m <= u; m++) {
-        const f = o.add(m, "day");
-        for (let s = 0; s < 24; s++)
-          e.push(f.hour(s).format("YYYY-MM-DD HH:mm:ss"));
-      }
-      return e;
-    }), S = x(() => Math.floor((c.value - 1) / 12) + 1), g = x(() => !t.valueData || t.valueData.length === 0 ? [] : t.valueData.reduce((o, a) => {
-      const u = o[o.length - 1];
-      return u && p(u).hour() === p(a).hour() ? o : [
-        ...o,
-        p(a).set("minute", 0).set("second", 0).format("YYYY-MM-DD HH:mm:ss")
+    const y = b(() => Math.floor((d.value - 1) / 12) + 1), x = b(() => !t.valueData || t.valueData.length === 0 ? [] : t.valueData.reduce((a, n) => {
+      const u = a[a.length - 1];
+      return u && c(u).hour() === c(n).hour() ? a : [
+        ...a,
+        c(n).set("minute", 0).set("second", 0).format("YYYY-MM-DD HH:mm:ss")
       ];
-    }, [])), y = (e, o) => {
-      const a = [];
-      for (let u = e; u <= o; u += 1)
-        a.push([u, 2]);
-      return a;
+    }, [])), R = (e, a) => {
+      const n = [];
+      for (let u = e; u <= a; u += 1)
+        n.push([u, 2]);
+      return n;
     }, w = () => {
       r.setOption({
-        graphic: n.value.map((e) => ({
+        graphic: o.value.map((e) => ({
           position: r.convertToPixel("grid", e)
         }))
       });
@@ -142,13 +161,13 @@ const ae = { class: "chart-container" }, re = B({
       r.dispatchAction({
         type: "hideTip"
       });
-    }, M = () => {
-      const e = Math.min(n.value[0][0], n.value[1][0]), o = Math.max(n.value[0][0], n.value[1][0]), a = y(e, o), u = n.value[0][0], m = n.value[1][0], f = u < m;
+    }, S = () => {
+      const e = Math.min(o.value[0][0], o.value[1][0]), a = Math.max(o.value[0][0], o.value[1][0]), n = R(e, a), u = o.value[0][0], f = o.value[1][0], v = u < f;
       r.setOption({
         series: [
           {
             id: "a",
-            data: n.value,
+            data: o.value,
             z: 80,
             silent: !0,
             animation: !1,
@@ -157,24 +176,24 @@ const ae = { class: "chart-container" }, re = B({
           },
           {
             id: "b",
-            data: a,
+            data: n,
             type: "line",
             areaStyle: {
               color: "rgba(160,210,255,0.14)"
             },
             symbolSize: 0,
-            markLine: C(a),
+            markLine: E(n),
             z: 90,
             silent: !0,
             animation: !1
           }
         ]
       }), r.setOption({
-        graphic: n.value.map((s, d) => ({
+        graphic: o.value.map((s, m) => ({
           position: r.convertToPixel("grid", s),
           type: "image",
           style: {
-            image: (f ? d === 0 : d === 1) ? t.startIcon : t.endIcon,
+            image: (v ? m === 0 : m === 1) ? t.startIcon : t.endIcon,
             width: t.symbolSize,
             height: t.symbolSize,
             x: -t.symbolSize / 2,
@@ -184,49 +203,43 @@ const ae = { class: "chart-container" }, re = B({
           z: 100
         }))
       });
-    }, R = () => {
-      h(
+    }, _ = () => {
+      g(
         "update:activeTime",
-        n.value.map((e) => b.value[e[0]])
+        o.value.map((e) => p.value[e[0]])
       );
-    }, W = (e, o) => {
-      const a = r.convertFromPixel("grid", o);
-      a[0] = Math.round(Math.min(Math.max(a[0], 0), c.value)), a[1] = n.value[e][1], n.value[e] = a, M(), R();
-    }, Z = (e, o) => {
-      const a = r.convertFromPixel("grid", o);
-      a[0] = Math.min(Math.max(a[0], 0), c.value), a[1] = n.value[e][1], n.value[e] = a, M();
-    }, T = (e) => {
+    }, W = (e, a) => {
+      const n = r.convertFromPixel("grid", a);
+      n[0] = Math.round(Math.min(Math.max(n[0], 0), d.value)), n[1] = o.value[e][1], o.value[e] = n, S(), _();
+    }, Z = (e, a) => {
+      const n = r.convertFromPixel("grid", a);
+      n[0] = Math.min(Math.max(n[0], 0), d.value), n[1] = o.value[e][1], o.value[e] = n, S();
+    }, k = (e) => {
       if (!e.ctrlKey && !e.shiftKey) return;
       e.preventDefault();
-      const o = e.deltaY, a = Math.abs(n.value[1][0] - n.value[0][0]);
+      const a = e.deltaY, n = Math.abs(o.value[1][0] - o.value[0][0]);
       if (e.shiftKey) {
-        const O = o > 0 ? 2 : -2;
-        let D = n.value[0][0] + O, z = n.value[1][0] + O;
-        D < 0 && (D = 0, z = a), z > c.value && (z = c.value, D = c.value - a), n.value = [
-          [D, 0],
-          [z, 0]
-        ], M(), R();
+        const O = a > 0 ? 2 : -2;
+        let M = o.value[0][0] + O, D = o.value[1][0] + O;
+        M < 0 && (M = 0, D = n), D > d.value && (D = d.value, M = d.value - n), o.value[0] = [M, 0], o.value[1] = [D, 0], S(), _();
         return;
       }
       const u = 0.1;
-      if (a <= 4 && o > 0) return;
-      let m = o > 0 ? Math.min(c.value, a * (1 + u)) : Math.max(4, a * (1 - u));
-      const f = (n.value[0][0] + n.value[1][0]) / 2;
-      let s = Math.round(f - m / 2), d = Math.round(f + m / 2);
-      s < 0 && (s = 0, d = Math.min(c.value, Math.round(m))), d > c.value && (d = c.value, s = Math.max(0, Math.round(c.value - m))), !(d - s < 4) && (n.value = [
-        [s, 0],
-        [d, 0]
-      ], M(), R());
-    }, k = () => {
-      const e = Math.min(n.value[0][0], n.value[1][0]), o = Math.max(n.value[0][0], n.value[1][0]), a = y(e, o), u = g.value.map(
-        (f) => [b.value.findIndex(
-          (d) => p(d).isSame(p(f), "hour")
+      if (n <= 4 && a > 0) return;
+      let f = a > 0 ? Math.min(d.value, n * (1 + u)) : Math.max(4, n * (1 - u));
+      const v = (o.value[0][0] + o.value[1][0]) / 2;
+      let s = Math.round(v - f / 2), m = Math.round(v + f / 2);
+      s < 0 && (s = 0, m = Math.min(d.value, Math.round(f))), m > d.value && (m = d.value, s = Math.max(0, Math.round(d.value - f))), !(m - s < 4) && (o.value[0] = [s, 0], o.value[1] = [m, 0], S(), _());
+    }, C = () => {
+      const e = Math.min(o.value[0][0], o.value[1][0]), a = Math.max(o.value[0][0], o.value[1][0]), n = R(e, a), u = x.value.map(
+        (v) => [p.value.findIndex(
+          (m) => c(m).isSame(c(v), "hour")
         ), 1]
-      ), m = [
+      ), f = [
         {
           id: "b",
           type: "line",
-          data: a,
+          data: n,
           areaStyle: {
             color: "rgba(160,210,255,0.14)"
           },
@@ -235,7 +248,7 @@ const ae = { class: "chart-container" }, re = B({
             width: 1
           },
           symbol: "none",
-          markLine: C(a),
+          markLine: E(n),
           z: 100,
           silent: !0,
           animation: !1
@@ -257,29 +270,31 @@ const ae = { class: "chart-container" }, re = B({
       return {
         tooltip: {
           triggerOn: "none",
-          formatter: function(f) {
-            const s = b.value[Math.round(f.data[0])];
-            return p(s).format("MM/DD HH:mm");
+          formatter: function(v) {
+            const s = p.value[Math.round(v.data[0])];
+            return c(s).format("MM/DD HH:mm");
           }
         },
         grid: {
           top: "50%",
-          left: "17",
-          right: "20"
+          left: "50",
+          right: "50"
         },
         xAxis: {
           min: 0,
-          max: c.value,
-          interval: t.autoInterval ? S.value : t.interval,
+          max: d.value,
+          interval: t.autoInterval ? y.value : t.interval,
           type: "value",
+          // boundaryGap: "0%",
+          boundaryGap: ["0%", "100%"],
           axisLine: { onZero: !1 },
           axisTick: { inside: !0 },
           splitLine: { show: !1 },
           axisLabel: {
-            formatter: function(f) {
-              let s = b.value[f];
-              const d = p(s).hour();
-              return d == 0 ? `{datebox|}{date|${p(s).format("MM/DD")}}` : `{time|${d}:00}`;
+            formatter: function(v) {
+              let s = p.value[v];
+              const m = c(s).hour();
+              return m == 0 ? `{datebox|}{date|${c(s).format("MM/DD")}}` : `{time|${m}:00}`;
             },
             rich: {
               datebox: {
@@ -309,15 +324,15 @@ const ae = { class: "chart-container" }, re = B({
             id: "a",
             type: "line",
             smooth: !0,
-            data: n.value,
+            data: o.value,
             areaStyle: {},
             symbolSize: 20
             // TODO: 待确认 // props.symbolSize,
           },
-          ...m
+          ...f
         ]
       };
-    }, C = (e) => ({
+    }, E = (e) => ({
       symbol: "none",
       animation: !1,
       z: 0,
@@ -348,23 +363,23 @@ const ae = { class: "chart-container" }, re = B({
         //   { coord: [initialPoints[initialPoints.length - 1][0], 0] },
         // ],
       ]
-    }), E = (e) => {
-      const o = [e.offsetX, e.offsetY];
+    }), I = (e) => {
+      const a = [e.offsetX, e.offsetY];
       r.convertFromPixel(
         { seriesIndex: 0 },
-        o
+        a
       );
     };
     return F(() => {
-      r = q.init(v.value, null, {
+      r = J.init(h.value, null, {
         renderer: "svg"
-      }), r.setOption(k()), setTimeout(() => {
+      }), r.setOption(C()), setTimeout(() => {
         r.setOption({
-          graphic: n.value.map((e, o) => ({
+          graphic: o.value.map((e, a) => ({
             type: "image",
             position: r.convertToPixel("grid", e),
             style: {
-              image: o === 0 ? t.startIcon : t.endIcon,
+              image: a === 0 ? t.startIcon : t.endIcon,
               width: t.symbolSize,
               height: t.symbolSize,
               x: -t.symbolSize / 2,
@@ -372,14 +387,14 @@ const ae = { class: "chart-container" }, re = B({
             },
             invisible: !1,
             draggable: "horizontal",
-            ondrag: function(a, u) {
-              Z(o, [this.x, this.y]);
+            ondrag: function(n, u) {
+              Z(a, [this.x, this.y]);
             },
             ondragend: function() {
-              W(o, [this.x, this.y]);
+              W(a, [this.x, this.y]);
             },
             onmousemove: function() {
-              P(o);
+              P(a);
             },
             onmouseout: function() {
               H();
@@ -387,34 +402,34 @@ const ae = { class: "chart-container" }, re = B({
             z: 200
           }))
         });
-      }, 0), window.addEventListener("resize", w), r.on("dataZoom", w), r.getZr().on("click", E), v.value.addEventListener("wheel", T, { passive: !1 });
+      }, 0), window.addEventListener("resize", w), r.on("dataZoom", w), r.getZr().on("click", I), h.value.addEventListener("wheel", k, { passive: !1 });
     }), $(() => {
-      window.removeEventListener("resize", w), r.off("dataZoom", w), r.getZr().off("click", E), v.value?.removeEventListener("wheel", T);
+      window.removeEventListener("resize", w), r.off("dataZoom", w), r.getZr().off("click", I), h.value?.removeEventListener("wheel", k);
     }), Y(
       () => t.timeRange,
       (e) => {
-        r && (r.setOption(k()), w());
+        r && (r.setOption(C()), w());
       },
       { immediate: !0 }
-    ), (e, o) => (G(), j("div", ae, [
-      U("div", {
+    ), (e, a) => (U(), j("div", re, [
+      q("div", {
         ref_key: "chartRef",
-        ref: v,
+        ref: h,
         class: "chart-wrap"
       }, null, 512)
     ]));
   }
-}), se = (i, l) => {
+}), le = (i, l) => {
   const t = i.__vccOpts || i;
-  for (const [h, v] of l)
-    t[h] = v;
+  for (const [g, h] of l)
+    t[g] = h;
   return t;
-}, le = /* @__PURE__ */ se(ie, [["__scopeId", "data-v-eb36b0a0"]]), ue = [le], ce = (i) => {
-  ue.forEach((l) => {
+}, ue = /* @__PURE__ */ le(se, [["__scopeId", "data-v-ec1e5d9c"]]), ce = [ue], de = (i) => {
+  ce.forEach((l) => {
     i.component(l.name, l);
   });
-}, pe = { install: ce };
+}, pe = { install: de };
 export {
-  le as DragChart,
+  ue as DragChart,
   pe as default
 };
