@@ -12,7 +12,7 @@
   "keywords": [
     "vue",
     "chart",
-    "draggable"
+    "drag range"
   ],
   "scripts": {
     "dev": "vite",

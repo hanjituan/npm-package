@@ -7,74 +7,12 @@
 <script lang="ts" setup name="DragChart">
 import dayjs from "dayjs";
 import * as echarts from "echarts";
-import {
-  computed,
-  onMounted,
-  onBeforeUnmount,
-  PropType,
-  ref,
-  watch,
-} from "vue";
+import dragProps from "./drag-props";
 import { useResizeObserver } from "@vueuse/core";
-import LeftImg from "@/assets/imgs/arrow-circle-left.png";
-import RightImg from "@/assets/imgs/arrow-circle-right.png";
+import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue";
 
 const props = defineProps({
-  // x轴的开始和结束时间
-  timeRange: {
-    type: Array as PropType<(string | Date | dayjs.Dayjs)[]>,
-    default: () => [dayjs().subtract(1, "day"), dayjs()],
-  },
-  // 开始图标
-  startIcon: {
-    type: String,
-    default: LeftImg,
-  },
-  // 结束图标
-  endIcon: {
-    type: String,
-    default: RightImg,
-  },
-  // 拖拽点的大小
-  symbolSize: {
-    type: Number,
-    default: 20,
-  },
-  // 目前是有值的柱子
-  valueData: {
-    type: Array,
-    default: () => [],
-  },
-  // 当前时间范围
-  activeTime: {
-    type: Array,
-    default: () => [0, 12],
-  },
-  // X轴的间隔
-  interval: {
-    type: Number,
-    default: 4,
-  },
-  // 是否自动计算间隔, 如果为true，则interval会被忽略
-  autoInterval: {
-    type: Boolean,
-    default: true,
-  },
-  // 是否支持点击修改位置
-  needClick: {
-    type: Boolean,
-    default: true,
-  },
-  // 最大选择范围（小时）
-  maxRange: {
-    type: Number,
-    default: 72, // 3天 = 72小时
-  },
-  // 最小选择范围（小时）
-  minRange: {
-    type: Number,
-    default: 3, // 3小时
-  },
+  ...dragProps,
 });
 
 const emit = defineEmits(["update:activeTime"]);
@@ -82,13 +20,23 @@ const emit = defineEmits(["update:activeTime"]);
 const chartRef = ref();
 let myChart: echarts.EChartsType;
 
-const MaxTick = computed(() => 24 * props.timeRange.length - 1);
+const getDiffDays = (
+  startDate = props.timeRange[0],
+  endDate = props.timeRange[props.timeRange.length - 1]
+) => {
+  return dayjs(endDate).diff(startDate, "day") + 1;
+};
+
+const MaxTick = computed(() => {
+  const diffDays = getDiffDays();
+  console.log(diffDays * 24);
+  return diffDays * 24;
+});
 // 图表初始化Axis data
 const xAxisData = computed(() => {
-  const result = [];
+  const result: string[] = [];
   const startDate = dayjs(props.timeRange[0]);
-  const endDate = dayjs(props.timeRange[props.timeRange.length - 1]);
-  const diffDays = endDate.diff(startDate, "day");
+  const diffDays = getDiffDays();
   for (let i = 0; i <= diffDays; i++) {
     const currentDate = startDate.add(i, "day");
     for (let j = 0; j < 24; j++) {
@@ -115,10 +63,16 @@ const getInitialData = () => {
     ];
   }
   const x1 = xAxisData.value.findIndex((x) =>
-    dayjs(x).isSame(dayjs(props.activeTime[0]), "hour")
+    dayjs(x).isSame(
+      dayjs(props.activeTime[0] as string | Date | dayjs.Dayjs),
+      "hour"
+    )
   );
   const x2 = xAxisData.value.findIndex((x) =>
-    dayjs(x).isSame(dayjs(props.activeTime[1]), "hour")
+    dayjs(x).isSame(
+      dayjs(props.activeTime[1] as string | Date | dayjs.Dayjs),
+      "hour"
+    )
   );
   return [
     [x1, 0],
@@ -699,6 +653,8 @@ onBeforeUnmount(() => {
 watch(
   () => props.timeRange,
   (newValue) => {
+    console.log("newValue", newValue);
+
     // 更新数据
     if (!myChart) return;
     // 更新图表
