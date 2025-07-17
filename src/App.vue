@@ -19,8 +19,8 @@ import dayjs from "dayjs";
 const code = `<DragChart v-model:active-time="activeTime" :value-data="valueData" />`;
 
 const activeTime = ref([
+  dayjs().subtract(5, "day").startOf("day"),
   dayjs().subtract(4, "day").startOf("day"),
-  dayjs().subtract(2, "day").endOf("day"),
 ]);
 
 const valueData = ref([
@@ -29,7 +29,7 @@ const valueData = ref([
   dayjs().subtract(5, "day").set("hour", 3),
   dayjs().subtract(5, "day").set("hour", 4),
   dayjs().subtract(5, "day").set("hour", 5),
-  dayjs().subtract(5, "day").set("hour", 6),
+  dayjs().subtract(2, "day").set("hour", 6),
 ]);
 
 const timeRange = ref([

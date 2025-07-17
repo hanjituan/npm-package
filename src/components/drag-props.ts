@@ -52,11 +52,21 @@ export default {
   // 最大选择范围（小时）
   maxRange: {
     type: Number,
-    default: 2 * 24, // 3天 = 72小时
+    default: 7 * 24, // 3天 = 72小时
   },
   // 最小选择范围（小时）
   minRange: {
     type: Number,
     default: 3, // 3小时
+  },
+  // 覆盖颜色
+  coverColor: {
+    type: String,
+    default: "rgba(160,210,255,0.14)", // 默认颜色
+  },
+  // 线段颜色
+  lineColor: {
+    type: String,
+    default: "#5CB0FE", // 默认线条颜色
   },
 };

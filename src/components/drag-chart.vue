@@ -29,7 +29,6 @@ const getDiffDays = (
 
 const MaxTick = computed(() => {
   const diffDays = getDiffDays();
-  console.log(diffDays * 24);
   return diffDays * 24;
 });
 // 图表初始化Axis data
@@ -145,6 +144,8 @@ const validateRange = (leftX: number, rightX: number) => {
         leftX = Math.max(0, MaxTick.value - props.minRange);
       }
     }
+  } else {
+    console.log(`当前范围: ${currentRange}, 最小范围: ${props.minRange}`);
   }
 
   // 确保最大范围
@@ -160,6 +161,8 @@ const validateRange = (leftX: number, rightX: number) => {
     } else if (rightX === MaxTick.value && rightX - leftX > props.maxRange) {
       leftX = MaxTick.value - props.maxRange;
     }
+  } else {
+    console.log(`当前范围: ${currentRange}, 最大范围: ${props.maxRange}`);
   }
 
   return {
@@ -215,7 +218,7 @@ const updateChartData = () => {
         data: initialPoints,
         type: "line",
         areaStyle: {
-          color: "rgba(160,210,255,0.14)",
+          color: props.coverColor,
         },
         symbolSize: 0,
         markLine: getBorderStyle(initialPoints),
@@ -384,10 +387,10 @@ const getChartOption = (): echarts.EChartsOption => {
       type: "line",
       data: initialPoints,
       areaStyle: {
-        color: "rgba(160,210,255,0.14)",
+        color: props.coverColor,
       },
       lineStyle: {
-        color: "#5CB0FE",
+        color: props.lineColor,
         width: 1,
       },
       symbol: "none",
@@ -397,7 +400,7 @@ const getChartOption = (): echarts.EChartsOption => {
       animation: false,
     },
     {
-      id: "c",
+      id: "barData",
       type: "bar",
       data: datalist,
       barWidth: 20,
@@ -487,7 +490,7 @@ const getBorderStyle = (initialPoints: string | any[]): any => {
     animation: false,
     z: 0,
     lineStyle: {
-      color: "#5CB0FE",
+      color: props.lineColor,
       width: 1,
       type: "solid",
     },
@@ -632,7 +635,7 @@ onMounted(() => {
 
   // 添加事件监听
   window.addEventListener("resize", updatePosition);
-  myChart.on("dataZoom", updatePosition);
+  // myChart.on("dataZoom", updatePosition);
   if (props.needClick) {
     // 添加点击事件监听
     myChart.getZr().on("click", onChartClick);
@@ -645,7 +648,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   // 移除事件监听
   window.removeEventListener("resize", updatePosition);
-  myChart.off("dataZoom", updatePosition);
+  // myChart.off("dataZoom", updatePosition);
   myChart.getZr().off("click", onChartClick);
   chartRef.value?.removeEventListener("wheel", handleWheel);
 });
@@ -653,8 +656,6 @@ onBeforeUnmount(() => {
 watch(
   () => props.timeRange,
   (newValue) => {
-    console.log("newValue", newValue);
-
     // 更新数据
     if (!myChart) return;
     // 更新图表
