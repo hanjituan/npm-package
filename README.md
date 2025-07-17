@@ -249,7 +249,11 @@ pnpm build
 
 [MIT](LICENSE) © 2025 hanjituan
 
-## 🔗 相关链接
+## � 效果展示
+
+![Example](https://raw.githubusercontent.com/hanjituan/npm-package/main/image.png)
+
+## �🔗 相关链接
 
 - [GitHub 仓库](https://github.com/hanjituan/npm-package)
 - [NPM 包](https://www.npmjs.com/package/drag-chart)
