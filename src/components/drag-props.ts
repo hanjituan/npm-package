@@ -70,3 +70,10 @@ export default {
     default: "#5CB0FE", // 默认线条颜色
   },
 };
+
+// 事件: outOfRange 拖拽超出范围
+//  参数 {
+//         type: "min",
+//         currentRange,
+//         minRange: props.minRange,
+//       }

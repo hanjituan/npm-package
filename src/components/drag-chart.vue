@@ -15,7 +15,8 @@ const props = defineProps({
   ...dragProps,
 });
 
-const emit = defineEmits(["update:activeTime"]);
+// 更新时间, 超出范围事件
+const emit = defineEmits(["update:activeTime", "outOfRange"]);
 
 const chartRef = ref();
 let myChart: echarts.EChartsType;
@@ -143,9 +144,14 @@ const validateRange = (leftX: number, rightX: number) => {
       } else if (rightX === MaxTick.value) {
         leftX = Math.max(0, MaxTick.value - props.minRange);
       }
+    } else {
+      // console.log(`当前范围: ${currentRange}, 最小范围: ${props.minRange}`);
+      emit("outOfRange", {
+        type: "min",
+        currentRange,
+        minRange: props.minRange,
+      });
     }
-  } else {
-    console.log(`当前范围: ${currentRange}, 最小范围: ${props.minRange}`);
   }
 
   // 确保最大范围
@@ -160,9 +166,14 @@ const validateRange = (leftX: number, rightX: number) => {
       rightX = props.maxRange;
     } else if (rightX === MaxTick.value && rightX - leftX > props.maxRange) {
       leftX = MaxTick.value - props.maxRange;
+    } else {
+      console.log(`当前范围: ${currentRange}, 最大范围: ${props.maxRange}`);
+      emit("outOfRange", {
+        type: "max",
+        currentRange,
+        minRange: props.minRange,
+      });
     }
-  } else {
-    console.log(`当前范围: ${currentRange}, 最大范围: ${props.maxRange}`);
   }
 
   return {
@@ -214,7 +225,7 @@ const updateChartData = () => {
         symbolSize: 0,
       },
       {
-        id: "b",
+        id: "lineRange",
         data: initialPoints,
         type: "line",
         areaStyle: {
@@ -383,7 +394,7 @@ const getChartOption = (): echarts.EChartsOption => {
 
   const seriesData: echarts.SeriesOption[] = [
     {
-      id: "b",
+      id: "lineRange",
       type: "line",
       data: initialPoints,
       areaStyle: {
@@ -579,20 +590,36 @@ const onChartClick = (params: any) => {
   updateActiveTime();
 };
 
-// onBeforeMount(() => {
-//   if (props.activeTime) {
-//     const x1 = xAxisData.value.findIndex((x) =>
-//       dayjs(x).isSame(dayjs(props.activeTime[0]), "hour")
-//     );
-//     const x2 = xAxisData.value.findIndex((x) =>
-//       dayjs(x).isSame(dayjs(props.activeTime[1]), "hour")
-//     );
-//     data.value = [
-//       [x1, 0],
-//       [x2, 0],
-//     ];
-//   }
-// });
+const setGraphic = () => {
+  myChart.setOption({
+    graphic: data.value.map((item, dataIndex) => ({
+      type: "image",
+      position: myChart.convertToPixel("grid", item),
+      style: {
+        image: dataIndex === 0 ? props.startIcon : props.endIcon,
+        width: props.symbolSize,
+        height: props.symbolSize,
+        x: -props.symbolSize / 2,
+        y: -props.symbolSize / 2,
+      },
+      invisible: false,
+      draggable: "horizontal",
+      ondrag: function (dx, dy) {
+        onPointDragging(dataIndex, [this.x, this.y]);
+      },
+      ondragend: function () {
+        onDragEnd(dataIndex, [this.x, this.y]);
+      },
+      onmousemove: function () {
+        showTooltip(dataIndex);
+      },
+      onmouseout: function () {
+        hideTooltip();
+      },
+      z: 200,
+    })),
+  });
+};
 
 // 初始化图表
 onMounted(() => {
@@ -603,38 +630,12 @@ onMounted(() => {
 
   // 设置拖拽点
   setTimeout(() => {
-    myChart.setOption({
-      graphic: data.value.map((item, dataIndex) => ({
-        type: "image",
-        position: myChart.convertToPixel("grid", item),
-        style: {
-          image: dataIndex === 0 ? props.startIcon : props.endIcon,
-          width: props.symbolSize,
-          height: props.symbolSize,
-          x: -props.symbolSize / 2,
-          y: -props.symbolSize / 2,
-        },
-        invisible: false,
-        draggable: "horizontal",
-        ondrag: function (dx, dy) {
-          onPointDragging(dataIndex, [this.x, this.y]);
-        },
-        ondragend: function () {
-          onDragEnd(dataIndex, [this.x, this.y]);
-        },
-        onmousemove: function () {
-          showTooltip(dataIndex);
-        },
-        onmouseout: function () {
-          hideTooltip();
-        },
-        z: 200,
-      })),
-    });
+    setGraphic();
   }, 0);
 
   // 添加事件监听
   window.addEventListener("resize", updatePosition);
+  // TODO: dataZoom 待更新
   // myChart.on("dataZoom", updatePosition);
   if (props.needClick) {
     // 添加点击事件监听
@@ -675,6 +676,7 @@ watch(
 .chart-wrap {
   width: 100%;
   height: 100%;
-  border: 1px solid #ddd;
+  min-width: 20px;
+  min-height: 20px;
 }
 </style>
