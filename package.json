@@ -1,7 +1,7 @@
 {
   "name": "drag-chart",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "A Vue 3 component for draggable charts",
   "author": {
