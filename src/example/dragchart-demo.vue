@@ -32,14 +32,14 @@ const activeTime = ref([
 const valueData = ref([
   dayjs().subtract(5, "day").set("hour", 1),
   dayjs().subtract(5, "day").set("hour", 2),
-  dayjs().subtract(5, "day").set("hour", 3),
-  dayjs().subtract(5, "day").set("hour", 4),
-  dayjs().subtract(5, "day").set("hour", 5),
-  dayjs().subtract(2, "day").set("hour", 6),
+  dayjs().subtract(5, "day").set("hour", 11),
+  dayjs().subtract(5, "day").set("hour", 12),
+  dayjs().subtract(5, "day").set("hour", 22),
+  dayjs().subtract(4, "day").set("hour", 6),
 ]);
 
 const timeRange = ref([
-  dayjs().subtract(5, "day").startOf("day"),
+  dayjs().subtract(2, "day").startOf("day"),
   dayjs().subtract(1, "day").endOf("day"),
 ]);
 </script>

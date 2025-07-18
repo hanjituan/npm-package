@@ -62,6 +62,24 @@ const getInitialData = () => {
       [xAxisData.value.length - 1, 0],
     ];
   }
+  // 判断 activeTime 是否在 timeRange 范围内
+  if (
+    dayjs(props.activeTime[0]).isBefore(dayjs(props.timeRange[0])) ||
+    dayjs(props.activeTime[1]).isAfter(
+      dayjs(props.timeRange[props.timeRange.length - 1])
+    )
+  ) {
+    emit("outOfRange", {
+      type: "activeTime",
+      value: props.activeTime,
+      timeRange: props.timeRange,
+      message: "activeTime is out of timeRange",
+    });
+    return [
+      [0, 0],
+      [24, 0],
+    ];
+  }
   const x1 = xAxisData.value.findIndex((x) =>
     dayjs(x).isSame(
       dayjs(props.activeTime[0] as string | Date | dayjs.Dayjs),
@@ -115,7 +133,15 @@ const barData = computed(() => {
     ];
   }, []);
 
-  return filteredData;
+  // 过滤掉不在timeRange范围内的数据
+  const start = dayjs(props.timeRange[0]);
+  const end = dayjs(props.timeRange[props.timeRange.length - 1]);
+  const filteredDatas = filteredData.filter((item) => {
+    const date = dayjs(item);
+    return date.isAfter(start) && date.isBefore(end);
+  });
+
+  return filteredDatas;
 });
 // 工具函数
 const generateInitialPoints = (x1: number, x2: number) => {
