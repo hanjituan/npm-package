@@ -534,7 +534,7 @@ const pe = { class: "chart-container" }, xe = T({
   for (const [g, R] of d)
     e[g] = R;
   return e;
-}, he = /* @__PURE__ */ fe(Ie, [["__scopeId", "data-v-7b44a6b9"]]), ye = [he], Ee = (v) => {
+}, he = /* @__PURE__ */ fe(Ie, [["__scopeId", "data-v-cbdfdbc3"]]), ye = [he], Ee = (v) => {
   ye.forEach((d) => {
     v.component(d.name, d);
   });
