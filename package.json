@@ -1,5 +1,13 @@
 {
   "name": "drag-chart",
+  "main": "drah-chart/drag-chart.es.js",
+  "module": "drah-chart/drag-chart.es.js",
+  "exports": {
+    ".": {
+      "import": "./drah-chart/drag-chart.es.js",
+      "require": "./drah-chart/drag-chart.es.js"
+    }
+  },
   "private": false,
   "version": "0.1.1",
   "type": "module",
