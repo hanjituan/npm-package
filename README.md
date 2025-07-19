@@ -4,6 +4,7 @@
 
 [![npm version](https://badge.fury.io/js/drag-chart.svg)](https://badge.fury.io/js/drag-chart)
 [![Vue 3](https://img.shields.io/badge/Vue-3-green.svg)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-support-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ 特性
@@ -15,6 +16,7 @@
 - 📏 **范围限制**: 可配置最大最小选择范围
 - 📊 **数据展示**: 支持显示有数据的时间段
 - 🎛️ **灵活配置**: 丰富的配置选项，满足各种需求
+- 📘 **TypeScript 支持**: 完整的类型定义，开发体验更佳
 
 ## 📦 安装
 
@@ -27,6 +29,8 @@ pnpm add drag-chart
 ```
 
 ## 🚀 快速开始
+
+### JavaScript
 
 ```vue
 <template>
@@ -51,6 +55,39 @@ const valueData = ref([
   dayjs().subtract(3, "hours"),
   dayjs().subtract(1, "hours"),
 ]);
+</script>
+```
+
+### TypeScript
+
+```vue
+<template>
+  <div style="width: 100%; height: 400px;">
+    <drag-chart
+      v-model:activeTime="activeTime"
+      :timeRange="timeRange"
+      :valueData="valueData"
+      @outOfRange="handleOutOfRange"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import dayjs, { type Dayjs } from "dayjs";
+import DragChart, { type OutOfRangeEvent, type TimeRange } from "drag-chart";
+
+const activeTime = ref<TimeRange>([dayjs().subtract(6, "hours"), dayjs()]);
+const timeRange = ref<TimeRange>([dayjs().subtract(7, "days"), dayjs()]);
+const valueData = ref<Dayjs[]>([
+  dayjs().subtract(5, "hours"),
+  dayjs().subtract(3, "hours"),
+  dayjs().subtract(1, "hours"),
+]);
+
+const handleOutOfRange = (event: OutOfRangeEvent) => {
+  console.log("超出范围:", event);
+};
 </script>
 ```
 
