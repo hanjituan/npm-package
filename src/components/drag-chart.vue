@@ -1,7 +1,9 @@
 <template>
-  <div class="chart-container">
-    <div ref="chartRef" style="min-width: 100px; min-height: 20px" class="chart-wrap"></div>
-  </div>
+  <div
+    ref="chartRef"
+    style="min-width: 100px; min-height: 100px"
+    class="chart-wrap"
+  ></div>
 </template>
 
 <script lang="ts" setup name="DragChart">
@@ -695,14 +697,8 @@ watch(
 </script>
 
 <style scoped>
-.chart-container {
-  width: 100%;
-  height: 100%;
-}
 .chart-wrap {
   width: 100%;
   height: 100%;
-  min-width: 20px;
-  min-height: 20px;
 }
 </style>
