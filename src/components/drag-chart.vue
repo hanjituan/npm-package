@@ -1,6 +1,6 @@
 <template>
-  <div class="chart-container">
-    <div ref="chartRef" style="min-width: 100px; min-height: 20px" class="chart-wrap"></div>
+  <div class="drag-chart-container">
+    <div ref="chartRef" class="drag-chart-wrap"></div>
   </div>
 </template>
 
@@ -694,15 +694,23 @@ watch(
 );
 </script>
 
-<style scoped>
-.chart-container {
+<style>
+/* 移除 scoped，允许样式被外部覆盖 */
+.drag-chart-container {
+  position: relative;
   width: 100%;
   height: 100%;
+  min-width: 100px;
+  min-height: 100px;
 }
-.chart-wrap {
-  width: 100%;
-  height: 100%;
-  min-width: 20px;
-  min-height: 20px;
+
+.drag-chart-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
 </style>
