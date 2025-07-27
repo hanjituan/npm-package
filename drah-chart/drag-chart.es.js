@@ -72,42 +72,42 @@ const re = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAA
     // 默认线条颜色
   }
 };
-function ue(v) {
-  return _() ? ($(v), !0) : !1;
+function ue(m) {
+  return _() ? ($(m), !0) : !1;
 }
 const ce = typeof window < "u" && typeof document < "u";
 typeof WorkerGlobalScope < "u" && globalThis instanceof WorkerGlobalScope;
 const ve = ce ? window : void 0;
-function Z(v) {
+function Z(m) {
   var d;
-  const e = S(v);
+  const e = S(m);
   return (d = e?.$el) != null ? d : e;
 }
 function me() {
-  const v = ee(!1), d = te();
+  const m = ee(!1), d = te();
   return d && G(() => {
-    v.value = !0;
-  }, d), v;
+    m.value = !0;
+  }, d), m;
 }
-function de(v) {
+function de(m) {
   const d = me();
-  return I(() => (d.value, !!v()));
+  return I(() => (d.value, !!m()));
 }
-function ge(v, d, e = {}) {
-  const { window: g = ve, ...R } = e;
+function ge(m, d, e = {}) {
+  const { window: g = ve, ...p } = e;
   let l;
   const E = de(() => g && "ResizeObserver" in g), A = () => {
     l && (l.disconnect(), l = void 0);
-  }, p = I(() => {
-    const f = S(v);
+  }, R = I(() => {
+    const f = S(m);
     return Array.isArray(f) ? f.map((h) => Z(h)) : [Z(f)];
   }), n = H(
-    p,
+    R,
     (f) => {
       if (A(), E.value && g) {
         l = new ResizeObserver(d);
         for (const h of f)
-          h && l.observe(h, R);
+          h && l.observe(h, p);
       }
     },
     { immediate: !0, flush: "post" }
@@ -127,10 +127,10 @@ const Re = T({
     ...Ae
   },
   emits: ["update:activeTime", "outOfRange"],
-  setup(v, { emit: d }) {
-    const e = v, g = d, R = ne();
+  setup(m, { emit: d }) {
+    const e = m, g = d, p = ne();
     let l;
-    const E = (t = e.timeRange[0], a = e.timeRange[e.timeRange.length - 1]) => u(a).diff(t, "day") + 1, A = I(() => E() * 24), p = I(() => {
+    const E = (t = e.timeRange[0], a = e.timeRange[e.timeRange.length - 1]) => u(a).diff(t, "day") + 1, A = I(() => E() * 24), R = I(() => {
       const t = [], a = u(e.timeRange[0]), i = E();
       for (let s = 0; s <= i; s++) {
         const o = a.add(s, "day");
@@ -149,7 +149,7 @@ const Re = T({
       if (!e.activeTime || e.activeTime.length !== 2)
         return [
           [0, 0],
-          [p.value.length - 1, 0]
+          [R.value.length - 1, 0]
         ];
       if (u(e.activeTime[0]).isBefore(u(e.timeRange[0])) || u(e.activeTime[1]).isAfter(
         u(e.timeRange[e.timeRange.length - 1])
@@ -163,12 +163,12 @@ const Re = T({
           [0, 0],
           [24, 0]
         ];
-      const t = p.value.findIndex(
+      const t = R.value.findIndex(
         (i) => u(i).isSame(
           u(e.activeTime[0]),
           "hour"
         )
-      ), a = p.value.findIndex(
+      ), a = R.value.findIndex(
         (i) => u(i).isSame(
           u(e.activeTime[1]),
           "hour"
@@ -179,7 +179,7 @@ const Re = T({
         [a, 0]
       ];
     };
-    ge(R, () => {
+    ge(p, () => {
       l && l.resize({
         width: "auto",
         height: "auto"
@@ -269,11 +269,11 @@ const Re = T({
           }
         ]
       }), l.setOption({
-        graphic: n.value.map((c, m) => ({
+        graphic: n.value.map((c, v) => ({
           position: l.convertToPixel("grid", c),
           type: "image",
           style: {
-            image: (r ? m === 0 : m === 1) ? e.startIcon : e.endIcon,
+            image: (r ? v === 0 : v === 1) ? e.startIcon : e.endIcon,
             width: e.symbolSize,
             height: e.symbolSize,
             x: -e.symbolSize / 2,
@@ -286,7 +286,7 @@ const Re = T({
     }, w = () => {
       g(
         "update:activeTime",
-        n.value.map((t) => p.value[t[0]])
+        n.value.map((t) => R.value[t[0]])
       );
     }, N = (t, a) => {
       const i = l.convertFromPixel("grid", a);
@@ -294,8 +294,8 @@ const Re = T({
       const s = Math.min(n.value[0][0], n.value[1][0]), o = Math.max(n.value[0][0], n.value[1][0]), { leftX: r, rightX: c } = B(
         s,
         o
-      ), m = n.value[0][0] <= n.value[1][0] ? 0 : 1, M = m === 0 ? 1 : 0;
-      n.value[m] = [r, 0], n.value[M] = [c, 0], C(), w();
+      ), v = n.value[0][0] <= n.value[1][0] ? 0 : 1, M = v === 0 ? 1 : 0;
+      n.value[v] = [r, 0], n.value[M] = [c, 0], C(), w();
     }, Y = (t, a) => {
       const i = l.convertFromPixel("grid", a);
       i[0] = Math.min(Math.max(i[0], 0), A.value), i[1] = n.value[t][1], n.value[t] = i, C();
@@ -316,17 +316,17 @@ const Re = T({
         Math.min(A.value, i * (1 + s))
       ) : Math.max(e.minRange, i * (1 - s));
       const r = (n.value[0][0] + n.value[1][0]) / 2;
-      let c = Math.round(r - o / 2), m = Math.round(r + o / 2);
-      c < 0 && (c = 0, m = Math.min(A.value, Math.round(o))), m > A.value && (m = A.value, c = Math.max(0, Math.round(A.value - o)));
+      let c = Math.round(r - o / 2), v = Math.round(r + o / 2);
+      c < 0 && (c = 0, v = Math.min(A.value, Math.round(o))), v > A.value && (v = A.value, c = Math.max(0, Math.round(A.value - o)));
       const { leftX: M, rightX: Q } = B(
         c,
-        m
+        v
       );
       n.value[0] = [M, 0], n.value[1] = [Q, 0], C(), w();
     }, L = () => {
       const t = Math.min(n.value[0][0], n.value[1][0]), a = Math.max(n.value[0][0], n.value[1][0]), i = W(t, a), s = J.value.map(
-        (r) => [p.value.findIndex(
-          (m) => u(m).isSame(u(r), "hour")
+        (r) => [R.value.findIndex(
+          (v) => u(v).isSame(u(r), "hour")
         ), 1]
       ), o = [
         {
@@ -364,7 +364,7 @@ const Re = T({
         tooltip: {
           triggerOn: "none",
           formatter: function(r) {
-            const c = p.value[Math.round(r.data[0])];
+            const c = R.value[Math.round(r.data[0])];
             return u(c).format("MM/DD HH:mm");
           }
         },
@@ -385,9 +385,9 @@ const Re = T({
           splitLine: { show: !1 },
           axisLabel: {
             formatter: function(r) {
-              let c = p.value[r];
-              const m = u(c).hour();
-              return m == 0 ? `{datebox|}{date|${u(c).format("MM/DD")}}` : `{time|${m}:00}`;
+              let c = R.value[r];
+              const v = u(c).hour();
+              return v == 0 ? `{datebox|}{date|${u(c).format("MM/DD")}}` : `{time|${v}:00}`;
             },
             rich: {
               datebox: {
@@ -463,7 +463,7 @@ const Re = T({
       if (!i || i.length < 2) return;
       const s = Math.round(
         Math.min(Math.max(i[0], 0), A.value)
-      ), o = Math.min(n.value[0][0], n.value[1][0]), r = Math.max(n.value[0][0], n.value[1][0]), c = Math.abs(s - o), m = Math.abs(s - r), M = c <= m, Q = n.value[0][0] <= n.value[1][0] ? 0 : 1, V = Q === 0 ? 1 : 0;
+      ), o = Math.min(n.value[0][0], n.value[1][0]), r = Math.max(n.value[0][0], n.value[1][0]), c = Math.abs(s - o), v = Math.abs(s - r), M = c <= v, Q = n.value[0][0] <= n.value[1][0] ? 0 : 1, V = Q === 0 ? 1 : 0;
       let D = o, x = r;
       if (M) {
         const U = r - e.minRange, O = Math.max(0, r - e.maxRange);
@@ -508,13 +508,13 @@ const Re = T({
       });
     };
     return G(() => {
-      l = se.init(R.value, null, {
+      l = se.init(p.value, null, {
         renderer: "svg"
       }), l.setOption(L()), setTimeout(() => {
         k();
-      }, 0), window.addEventListener("resize", z), e.needClick && l.getZr().on("click", P), R.value.addEventListener("wheel", q, { passive: !1 });
+      }, 0), window.addEventListener("resize", z), e.needClick && l.getZr().on("click", P), p.value.addEventListener("wheel", q, { passive: !1 });
     }), ae(() => {
-      window.removeEventListener("resize", z), l.getZr().off("click", P), R.value?.removeEventListener("wheel", q);
+      window.removeEventListener("resize", z), l.getZr().off("click", P), p.value?.removeEventListener("wheel", q);
     }), H(
       () => e.timeRange,
       (t) => {
@@ -523,22 +523,17 @@ const Re = T({
       { immediate: !0 }
     ), (t, a) => (oe(), ie("div", {
       ref_key: "chartRef",
-      ref: R,
-      style: { "min-width": "100px", "min-height": "100px" },
+      ref: p,
+      style: { "min-width": "100px", "min-height": "100px", height: "100%", width: "100%" },
       class: "chart-wrap"
     }, null, 512));
   }
-}), xe = (v, d) => {
-  const e = v.__vccOpts || v;
-  for (const [g, R] of d)
-    e[g] = R;
-  return e;
-}, Ie = /* @__PURE__ */ xe(pe, [["__scopeId", "data-v-e1392702"]]), fe = [Ie], he = (v) => {
-  fe.forEach((d) => {
-    v.component(d.name, d);
+}), xe = [pe], Ie = (m) => {
+  xe.forEach((d) => {
+    m.component(d.name, d);
   });
-}, Ce = { install: he };
+}, ye = { install: Ie };
 export {
-  Ie as DragChart,
-  Ce as default
+  pe as DragChart,
+  ye as default
 };
