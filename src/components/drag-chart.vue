@@ -1,7 +1,7 @@
 <template>
   <div
     ref="chartRef"
-    style="min-width: 100px; min-height: 100px"
+    style="min-width: 100px; min-height: 100px; height: 100%; width: 100%"
     class="chart-wrap"
   ></div>
 </template>
@@ -695,10 +695,3 @@ watch(
   { immediate: true }
 );
 </script>
-
-<style scoped>
-.chart-wrap {
-  width: 100%;
-  height: 100%;
-}
-</style>
