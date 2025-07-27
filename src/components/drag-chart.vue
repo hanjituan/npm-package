@@ -1,6 +1,6 @@
 <template>
-  <div class="drag-chart-container">
-    <div ref="chartRef" class="drag-chart-wrap"></div>
+  <div class="chart-container">
+    <div ref="chartRef" style="min-width: 100px; min-height: 20px" class="chart-wrap"></div>
   </div>
 </template>
 
@@ -694,28 +694,15 @@ watch(
 );
 </script>
 
-<style>
-/* 使用更具体的选择器确保样式优先级 */
-.drag-chart-container {
-  display: block; /* 确保元素能撑开 */
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-width: 100px;
-  min-height: 100px;
-}
-
-.drag-chart-container .drag-chart-wrap {
-  display: block; /* 确保元素能撑开 */
-  position: absolute;
-  inset: 0; /* 替代 top/right/bottom/left */
+<style scoped>
+.chart-container {
   width: 100%;
   height: 100%;
 }
-
-/* 确保 ECharts 容器样式 */
-.drag-chart-container .drag-chart-wrap > div {
-  width: 100% !important;
-  height: 100% !important;
+.chart-wrap {
+  width: 100%;
+  height: 100%;
+  min-width: 20px;
+  min-height: 20px;
 }
 </style>
