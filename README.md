@@ -295,3 +295,34 @@ pnpm build
 - [GitHub 仓库](https://github.com/hanjituan/npm-package)
 - [NPM 包](https://www.npmjs.com/package/drag-chart)
 - [问题反馈](https://github.com/hanjituan/npm-package/issues)
+
+## 使用注意事项
+
+### 容器尺寸设置
+
+组件需要一个具有明确尺寸的父容器才能正确显示：
+
+```vue
+<!-- ✅ 正确使用 - 固定尺寸 -->
+<div style="width: 800px; height: 400px;">
+  <drag-chart />
+</div>
+
+<!-- ✅ 正确使用 - 响应式尺寸 -->
+<div class="chart-container">
+  <drag-chart />
+</div>
+
+<style>
+.chart-container {
+  width: 100%;
+  height: 400px;
+  /* 或者使用其他尺寸单位 */
+}
+</style>
+
+<!-- ❌ 错误使用 - 没有设置尺寸 -->
+<div>
+  <drag-chart />
+</div>
+```

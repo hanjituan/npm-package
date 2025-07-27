@@ -695,8 +695,9 @@ watch(
 </script>
 
 <style>
-/* 移除 scoped，允许样式被外部覆盖 */
+/* 使用更具体的选择器确保样式优先级 */
 .drag-chart-container {
+  display: block; /* 确保元素能撑开 */
   position: relative;
   width: 100%;
   height: 100%;
@@ -704,12 +705,16 @@ watch(
   min-height: 100px;
 }
 
-.drag-chart-wrap {
+.drag-chart-container .drag-chart-wrap {
+  display: block; /* 确保元素能撑开 */
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0; /* 替代 top/right/bottom/left */
+  width: 100%;
+  height: 100%;
+}
+
+/* 确保 ECharts 容器样式 */
+.drag-chart-container .drag-chart-wrap > div {
   width: 100% !important;
   height: 100% !important;
 }
