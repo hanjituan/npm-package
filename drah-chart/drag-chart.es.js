@@ -524,7 +524,7 @@ const Re = T({
     ), (t, a) => (oe(), ie("div", {
       ref_key: "chartRef",
       ref: p,
-      style: { "min-width": "100px", "min-height": "100px", height: "100%", width: "100%" },
+      style: { "min-width": "100px", "min-height": "10px", height: "100%", width: "100%" },
       class: "chart-wrap"
     }, null, 512));
   }
